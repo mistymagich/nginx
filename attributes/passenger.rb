@@ -23,7 +23,13 @@
 node.default['nginx']['passenger']['version'] = '4.0.57'
 
 if node['nginx']['repo_source'] == 'passenger'
-  node.default['nginx']['passenger']['root'] = '/usr/lib/ruby/vendor_ruby/phusion_passenger/locations.ini'
+  case node['platform_family']
+  when 'rhel', 'fedora'
+    node.default['nginx']['passenger']['root'] = '/usr/share/ruby/vendor_ruby/phusion_passenger/locations.ini'
+  when 'debian'
+    node.default['nginx']['passenger']['root'] = '/usr/lib/ruby/vendor_ruby/phusion_passenger/locations.ini'
+  end
+
   node.default['nginx']['passenger']['ruby'] = '/usr/bin/ruby'
 elsif node['languages'].attribute?('ruby')
   node.default['nginx']['passenger']['root'] = "#{node['languages']['ruby']['gems_dir']}/gems/passenger-#{node['nginx']['passenger']['version']}"

@@ -17,10 +17,24 @@
 
 case node['platform_family']
 when 'rhel', 'fedora'
+  include_recipe 'yum-epel'
 
-  log 'There is not official phusion passenger repo for redhat based systems.' do
-    level :info
+  remote_file '/etc/yum.repos.d/passenger.repo' do
+    source 'https://oss-binaries.phusionpassenger.com/yum/definitions/el-passenger.repo'
+    owner 'root'
+    mode '0600'
+    action :create
+
+    notifies :run, 'execute[nginx-passenger-yum-makecache]', :immediately
   end
+
+  execute 'nginx-passenger-yum-makecache' do
+    user 'root'
+    command 'yum -y -q makecache --disablerepo=* --enablerepo=passenger*'
+    action :run
+  end
+
+  include_recipe 'nginx::passenger'
 
 when 'debian'
   include_recipe 'apt::default'

@@ -26,6 +26,8 @@ if platform_family?('rhel')
   elsif node['nginx']['repo_source'] == 'nginx'
     include_recipe 'nginx::repo'
     package_install_opts = '--disablerepo=* --enablerepo=nginx'
+  elsif node['nginx']['repo_source'] == 'passenger'
+    include_recipe 'nginx::repo_passenger'
   elsif node['nginx']['repo_source'].to_s.empty?
     log "node['nginx']['repo_source'] was not set, no additional yum repositories will be installed." do
       level :debug
